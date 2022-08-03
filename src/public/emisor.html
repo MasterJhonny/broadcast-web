@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emisor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./styles.css">
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="./opencv.js" type="text/javascript"></script>
+</head>
+<body>
+    <header>
+        <a  class="btn" href="index.html">volver</a>
+        <h2 class="title" >Emisor</h2>
+    </header>
+    <div class="container">
+        <p id="status"></p>
+        <video class="video" id="video" width="1280" height="720"></video>
+        <button class="btn" id="btn">Emitir</button>
+        <canvas id="preview"></canvas>
+    </div>
+    <script>
+        const canvas = document.getElementById("preview");
+        const btn = document.getElementById("btn");
+        const FPS = 45;
+        canvas.style.display = "none";
+        const video = document.getElementById("video");
+        const socket = io();
+        
+        function loadDisplay() {
+            const options = {
+                video: true
+            }
+            window.navigator.mediaDevices.getDisplayMedia(options)
+            .then(stream => {
+                video.srcObject = stream;
+                video.play();
+            })
+            .catch(err => console.log('Ups! to Error', err));
+
+            let src = new cv.Mat(video.height, video.width, cv.CV_8UC4);
+            let cap = new cv.VideoCapture(video);
+
+            function precessVideo () {
+                let begin = Date.now();
+                
+                cap.read(src);
+                cv.imshow("preview", src); 
+                socket.emit("stream", canvas.toDataURL("image/jpeg"));
+    
+                let delay = 1000/ FPS - (Date.now() - begin);
+                setTimeout(precessVideo, delay);
+            }
+            setTimeout(precessVideo, 0);
+        }
+        
+
+        function publicMessage(message) {
+            const salida = document.getElementById("status");
+            salida.classList.add('live');
+            salida.innerText = message;
+        }
+
+        function loadCamare() {
+            publicMessage("Share Display");
+            setTimeout(() => {
+                publicMessage("Live Display")
+            }, 2000)
+        }
+
+        function errorCamera() {
+            publicMessage("Display Fail!")
+            setTimeout(() => {
+                publicMessage("not Live")
+            }, 2000) 
+        }
+
+        
+        btn.onclick = () => {
+            alert(btn.innerText)
+            if (btn.innerText === 'Emitir') {
+                loadCamare();
+                loadDisplay();
+                console.log("emitiendo!")
+
+                btn.innerText = 'Dejar de emitir';
+            } else {
+                window.location.reload();
+            }
+
+        }
+    </script>
+</body>
+</html>
