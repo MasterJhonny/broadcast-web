@@ -21,78 +21,11 @@
         <p id="status"></p>
         <video class="video" id="video" width="1280" height="720"></video>
         <button class="btn" id="btn">Emitir</button>
+        <select id="menu" name="diplay" class="btn">
+            <option value="">---</option>
+        </select>
         <canvas id="preview"></canvas>
     </div>
-    <script>
-        const canvas = document.getElementById("preview");
-        const btn = document.getElementById("btn");
-        const FPS = 45;
-        canvas.style.display = "none";
-        const video = document.getElementById("video");
-        const socket = io();
-        
-        function loadDisplay() {
-            const options = {
-                video: true
-            }
-            window.navigator.mediaDevices.getDisplayMedia(options)
-            .then(stream => {
-                video.srcObject = stream;
-                video.play();
-            })
-            .catch(err => console.log('Ups! to Error', err));
-
-            let src = new cv.Mat(video.height, video.width, cv.CV_8UC4);
-            let cap = new cv.VideoCapture(video);
-
-            function precessVideo () {
-                let begin = Date.now();
-                
-                cap.read(src);
-                cv.imshow("preview", src); 
-                socket.emit("stream", canvas.toDataURL("image/jpeg"));
-    
-                let delay = 1000/ FPS - (Date.now() - begin);
-                setTimeout(precessVideo, delay);
-            }
-            setTimeout(precessVideo, 0);
-        }
-        
-
-        function publicMessage(message) {
-            const salida = document.getElementById("status");
-            salida.classList.add('live');
-            salida.innerText = message;
-        }
-
-        function loadCamare() {
-            publicMessage("Share Display");
-            setTimeout(() => {
-                publicMessage("Live Display")
-            }, 2000)
-        }
-
-        function errorCamera() {
-            publicMessage("Display Fail!")
-            setTimeout(() => {
-                publicMessage("not Live")
-            }, 2000) 
-        }
-
-        
-        btn.onclick = () => {
-            alert(btn.innerText)
-            if (btn.innerText === 'Emitir') {
-                loadCamare();
-                loadDisplay();
-                console.log("emitiendo!")
-
-                btn.innerText = 'Dejar de emitir';
-            } else {
-                window.location.reload();
-            }
-
-        }
-    </script>
+    <script src="./emisor.js" ></script>
 </body>
 </html>
