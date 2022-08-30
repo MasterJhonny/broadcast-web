@@ -1,8 +1,6 @@
-const address = require('address');
-
 module.exports = {
     appConfig: {
-        host: address.ip(),
+        host: "localhost",
         port: 8080
     }
 }

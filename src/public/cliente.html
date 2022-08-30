@@ -8,18 +8,18 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./styles.css">
+    <link rel="stylesheet" href="./css/styles.css">
     <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
     <header>
         <a class="btn" href="index.html">volver</a>
         <h2 class="title" >Cliente</h2>
+        <button class="btn" id="btn">Recargar</button>
     </header>
     <div class="container">
-        <img class="display" id="play" src="./assets/fondo.png" width="1280" height="720" alt="share">
+        <img class="display" id="play" src="./assets/fondo.png" width="854" height="480" alt="share">
     </div>
-    <button class="btn" id="btn">Recargar</button>
     <script>
         const btn = document.getElementById("btn");
 
@@ -28,6 +28,14 @@
         }
 
         const socket = io();
+
+        socket.on("connect", () => {
+            console.log("socket connect", socket.id);
+        })
+
+        socket.on("saludo:send", (saludo) => {
+            console.log(saludo);
+        })
 
         socket.on("stream", (image) => {
             let img = document.getElementById("play");

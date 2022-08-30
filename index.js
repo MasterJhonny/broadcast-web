@@ -1,70 +1,30 @@
-const http = require('./src/app');
-const { app, BrowserWindow, Menu, desktopCapturer, ipcMain } = require("electron");
-const path = require("path");
-const url = require("url");
+const express = require('express');
+const path = require('path');
+const { createServer } = require('http');
+const { Server } = require('socket.io');
+const { appConfig } = require("./src/config")
 
-const { appConfig } = require('./src/config');
-const port = appConfig.port || 8080;
+const app = express();
+const httpServer = createServer(app);
+const io = new Server(httpServer);
+const port = appConfig.port;
 
+app.use(express.static(path.join(__dirname, "src/public")));
 
-http.listen(port, () => {
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "src/public"));
+})
+io.on("connect", socket => {
+    console.log(socket.id)
+
+    socket.on("saludo", (saludo) => {
+        socket.broadcast.emit("saludo:send", saludo)
+    })
+    socket.on("stream", (stream) => {
+        socket.broadcast.emit("stream", stream)
+    })
+})
+
+httpServer.listen(port, () => {
     console.log(`http://localhost:${port}`);
-})
-
-let mainWindow;
-
-app.whenReady().then(() => { 
-    // The Main Window
-    mainWindow = new BrowserWindow({
-        width: 1920,
-        height: 1080,
-        minWidth: 1280,
-        minHeight: 720,
-        webPreferences: {
-            preload: path.join(__dirname, 'preload.js'),
-            nodeIntegration: true
-        }
-    });
-    
-    // mainWindow.webContents.openDevTools();
-    mainWindow.loadURL(`http://localhost:${port}/index.html`);
-
-    ipcMain.on('message', (e, data) => {
-        console.log(data)
-        desktopCapturer.getSources({ types: ['window', 'screen'] }).then(async sources => {
-            const decives = [];
-            for (const source of sources) {
-              decives.push({
-                name: source.name,
-                id: source.id
-              })
-            }
-            mainWindow.webContents.send('set:sourse', decives)
-        })
-    });
-
-})
-
-
-// Menu Template
-const templateMenu = []
-
-templateMenu.push({
-    label: 'DevTools',
-    submenu: [
-        {
-            label: 'Show/Hide Dev Tools',
-            accelerator: process.platform == 'darwin' ? 'Comand+D' : 'Ctrl+D',
-            click(item, focusedWindow) {
-                focusedWindow.toggleDevTools();
-            }
-        },
-        {
-            role: 'reload'
-        }
-    ]
-})
-
-const mainMenu = Menu.buildFromTemplate(templateMenu);
-// Set The Menu to the Main Window
-Menu.setApplicationMenu(mainMenu);
+});

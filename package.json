@@ -1,21 +1,18 @@
 {
   "name": "broadcast",
-  "productName": "broadcast",
+  "productName": "broadcast-web",
   "version": "1.0.0",
   "description": "My Electron application description",
   "main": "./index.js",
   "scripts": {
-    "start": "electron ."
+    "dev": "nodemon index.js",
+    "start": "node index.js"
   },
   "keywords": [],
   "author": "eddyfu",
   "license": "MIT",
   "dependencies": {
-    "address": "^1.2.0",
     "express": "^4.18.1",
     "socket.io": "^4.5.1"
-  },
-  "devDependencies": {
-    "electron": "^20.0.2"
   }
 }

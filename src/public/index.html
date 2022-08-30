@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
-    <link rel="stylesheet" href="./styles.css">
+    <link rel="stylesheet" href="./css/styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700&display=swap" rel="stylesheet">
@@ -13,21 +13,13 @@
 <body>
     <h2 class="title">App Broadcast</h2>
     <div class="container">
-        <img class="logo" src="./assets/cop.png" alt="logo">
-        <a class="btn" href="http://localhost:8080/emisor.html">Transmitir</a>
-        <a class="btn" id="host" href="http://192.168.1.102:8080/cliente.html">Recibir transmisión</a>
+        <img class="logo" src="./assets/emit.png" alt="logo">
+        <a class="btn" href="emisor.html">Transmitir</a>
+        <a class="btn" href="cliente.html">Recibir transmisión</a>
     </div>
     <script>
         window.addEventListener("DOMContentLoaded", () => {
-            const host = document.getElementById("host");
-            (() => {
-                fetch('http://localhost:8080/ip')
-                .then(res => res.json())
-                .then(data => {
-                    host.href = `http://${data.host}:8080/cliente.html`
-                })
-                .catch(err => console.log('Up!, error', err));
-            })()
+            console.log("load!")
         })
     </script>
 </body>
